@@ -462,6 +462,14 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     ((Creature*)unitTarget)->SetDeathState(JUST_ALIVED);
                     return;
                 }
+                case 8913:                                  // Sacred Cleansing
+                {
+                    if (!unitTarget || ((Creature*)unitTarget)->GetEntry() != 1200)
+                        return;
+
+                    unitTarget->RemoveAurasDueToSpell(8909);
+                    return;
+                }
                 case 9976:                                  // Polly Eats the E.C.A.C.
                 {
                     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT)
