@@ -1750,6 +1750,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         uint32 m_regenTimer;
         uint32 m_lastManaUseTimer;
 
+        bool m_isCreatureLinkingTrigger;
+        bool m_isSpawningLinked;
     private:
         void CleanupDeletedAuras();
 
