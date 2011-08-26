@@ -5560,6 +5560,9 @@ void SpellAuraHolder::Update(uint32 diff)
             if(Player* modOwner = caster->GetSpellModOwner())
                 modOwner->ApplySpellMod(GetId(), SPELLMOD_RANGE, max_range, NULL);
 
+                // This is no strict range check: add 6.25, just like we do it in Spell::CheckRange!
+                max_range += 6.25;
+
             if(!caster->IsWithinDistInMap(m_target, max_range))
             {
                 caster->InterruptSpell(CURRENT_CHANNELED_SPELL);
