@@ -6763,7 +6763,21 @@ void Player::CastItemCombatSpell(Unit* Target, WeaponAttackType attType)
             if (roll_chance_f(chance))
             {
                 if (IsPositiveSpell(spellInfo->Id))
-                    CastSpell(this, spellInfo->Id, true, item);
+                {
+                        CastSpell(this, spellInfo->Id, true, item);
+                        for (int i = 0; i < MAX_EFFECT_INDEX; i++)  // instantly do extra attacks, not on next swing!
+                        {
+                                if (spellInfo->Effect[i] == SPELL_EFFECT_ADD_EXTRA_ATTACKS)
+                                {
+                                        if (m_extraAttacks > 0)
+                                        {
+                                                --m_extraAttacks;
+                                                AttackerStateUpdate(Target,BASE_ATTACK,false);
+                                        }
+                                        break;
+                                }
+                        }
+                }
                 else
                     CastSpell(Target, spellInfo->Id, true, item);
             }
