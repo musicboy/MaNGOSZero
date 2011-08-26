@@ -934,6 +934,16 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
     // Do healing and triggers
     if (m_healing)
     {
+        bool crit = real_caster && real_caster->IsSpellCrit(unitTarget, m_spellInfo, m_spellSchoolMask);
+        uint32 addhealth = m_healing;
+        if (crit)
+        {
+            procEx |= PROC_EX_CRITICAL_HIT;
+            addhealth = caster->SpellCriticalHealingBonus(m_spellInfo, addhealth, NULL);
+        }
+        else
+            procEx |= PROC_EX_NORMAL_HIT;
+
         // Do triggers for unit (reflect triggers passed on hit phase for correct drop charge)
         if (m_canTrigger && missInfo != SPELL_MISS_REFLECT)
         {
@@ -947,24 +957,11 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
                     // stored in unused spell effect basepoints in main spell code
                     uint32 spellid = m_currentBasePoints[EFFECT_INDEX_1];
                     spellInfo = sSpellStore.LookupEntry(spellid);
-
-                    m_healing = caster->SpellHealingBonusDone(unitTarget, spellInfo, m_healing, HEAL);
-                    m_healing = unitTarget->SpellHealingBonusTaken(caster, spellInfo, m_healing, HEAL);
                 }
             }
 
-            caster->ProcDamageAndSpell(unitTarget, real_caster ? procAttacker : PROC_FLAG_NONE, procVictim, procEx, m_healing, m_attackType, spellInfo);
+            caster->ProcDamageAndSpell(unitTarget, real_caster ? procAttacker : PROC_FLAG_NONE, procVictim, procEx, addhealth, m_attackType, spellInfo);
         }
-
-        bool crit = real_caster && real_caster->IsSpellCrit(unitTarget, m_spellInfo, m_spellSchoolMask);
-        uint32 addhealth = m_healing;
-        if (crit)
-        {
-            procEx |= PROC_EX_CRITICAL_HIT;
-            addhealth = caster->SpellCriticalHealingBonus(m_spellInfo, addhealth, NULL);
-        }
-        else
-            procEx |= PROC_EX_NORMAL_HIT;
 
         int32 gain = caster->DealHeal(unitTarget, addhealth, m_spellInfo, crit);
 
