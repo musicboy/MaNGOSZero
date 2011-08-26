@@ -2671,9 +2671,27 @@ void Spell::handle_immediate()
     // process immediate effects (items, ground, etc.) also initialize some variables
     _handle_immediate_phase();
 
+    bool resist = false;
+
     // start channeling if applicable (after _handle_immediate_phase for get persistent effect dynamic object for channel target
     if (IsChanneledSpell(m_spellInfo) && m_duration)
     {
+        if (!m_UniqueTargetInfo.empty() &&
+        // Drain Life
+        ((m_spellInfo->SpellIconID == 546 && m_spellInfo->SpellVisual == 177)
+        // Drain Soul
+        || (m_spellInfo->SpellIconID == 113 && m_spellInfo->SpellVisual == 788)
+        // Drain Mana + Mind Flay
+        || (m_spellInfo->SpellIconID == 548 && m_spellInfo->SpellVisual == 277)
+        // Mind Control
+        || (m_spellInfo->SpellIconID == 235 && m_spellInfo->SpellVisual == 137)
+        // Mind Vision
+        || (m_spellInfo->SpellIconID == 502 && m_spellInfo->SpellVisual == 4839)))
+        {
+            SpellMissInfo missInfo = m_UniqueTargetInfo.begin()->missCondition;
+            if (missInfo == SPELL_MISS_MISS || missInfo == SPELL_MISS_RESIST)
+                resist = true;
+        }
         m_spellState = SPELL_STATE_CASTING;
         SendChannelStart(m_duration);
     }
@@ -2692,6 +2710,9 @@ void Spell::handle_immediate()
 
     if(m_spellState != SPELL_STATE_CASTING)
         finish(true);                                       // successfully finish spell cast (not last in case autorepeat or channel spell)
+
+    if(resist && m_caster)
+       m_caster->InterruptSpell(CURRENT_CHANNELED_SPELL);
 }
 
 uint64 Spell::handle_delayed(uint64 t_offset)
