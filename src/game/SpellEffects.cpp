@@ -4529,11 +4529,7 @@ void Spell::EffectAddExtraAttacks(SpellEffectIndex /*eff_idx*/)
     if( unitTarget->m_extraAttacks )
         return;
 
-    if (m_spellInfo->Id == 20178) // Reckoning
-        if (unitTarget->m_extraAttacks < 4)
-            unitTarget->m_extraAttacks += damage;
-    else
-        unitTarget->m_extraAttacks = damage;
+    unitTarget->m_extraAttacks = damage;
 }
 
 void Spell::EffectParry(SpellEffectIndex /*eff_idx*/)
