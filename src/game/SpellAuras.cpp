@@ -1379,6 +1379,73 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
         {
             switch(GetId())
             {
+                case 126:                                   // Eye of Kilrogg
+                {
+                    if (target->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    Player* caster = (Player*)GetCaster();
+
+                    if (!caster)
+                        return;
+
+                    if (apply)
+                    {
+                        if (Pet* eye = caster->FindGuardianWithEntry(GetSpellProto()->EffectMiscValue[EFFECT_INDEX_0]))
+                        {
+                            eye->addUnitState(UNIT_STAT_CONTROLLED);
+
+                            eye->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+
+                            eye->SetCharmerGuid(caster->GetGUID());
+                            eye->setFaction(caster->getFaction());
+
+                            caster->SetCharm(eye);
+
+                            caster->GetCamera().SetView(eye);
+                            caster->SetClientControl(eye, 1);
+                            caster->SetMover(eye);
+
+                            eye->CombatStop(true);
+                            eye->DeleteThreatList();
+                            eye->getHostileRefManager().deleteReferences();
+
+                            if(CharmInfo *charmInfo = eye->InitCharmInfo(target))
+                            {
+                                charmInfo->InitPossessCreateSpells();
+                                charmInfo->SetReactState(REACT_PASSIVE);
+                                charmInfo->SetCommandState(COMMAND_STAY);
+                            }
+
+                            caster->PossessSpellInitialize();
+                            eye->AIM_Initialize();
+                            eye->SetSpeedRate(MOVE_RUN, 2.0f, true);
+                        }
+                    }
+                    else
+                    {
+                        if (Pet* eye = caster->FindGuardianWithEntry(GetSpellProto()->EffectMiscValue[EFFECT_INDEX_0]))
+                        {
+                            caster->RemoveGuardian(eye);
+                            eye->CombatStop();
+                            eye->AddObjectToRemoveList();
+                        }
+                        caster->InterruptSpell(CURRENT_CHANNELED_SPELL);  // the spell is not automatically canceled when interrupted, do it now
+                        caster->SetCharm(NULL);
+
+                        caster->GetCamera().ResetView();
+                        caster->SetClientControl(caster, 1);
+                        caster->SetMover(NULL);
+
+                        caster->RemovePetActionBar();
+
+                        // on delete only do caster related effects
+                        if (m_removeMode == AURA_REMOVE_BY_DELETE)
+                            return;
+                    }
+
+                    return;
+                }
                 case 6606:                                  // Self Visual - Sleep Until Cancelled (DND)
                 {
                     if (apply)
