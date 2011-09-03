@@ -4009,14 +4009,19 @@ SpellCastResult Spell::CheckCast(bool strict)
         }
 
         //Must be behind the target.
-        if( m_spellInfo->AttributesEx2 == 0x100000 && (m_spellInfo->AttributesEx & 0x200) == 0x200 && target->HasInArc(M_PI_F, m_caster) )
+        if( ((m_spellInfo->AttributesEx2 == 0x100000 && (m_spellInfo->AttributesEx & 0x200) == 0x200) ||
+            (m_spellInfo->SpellFamilyName == SPELLFAMILY_GENERIC && m_spellInfo->SpellIconID == 243 && m_spellInfo->SpellVisual == 611)) && target->HasInArc(M_PI_F, m_caster) )
         {
             //Exclusion for Pounce: Facing Limitation was removed in 2.0.1, but it still uses the same, old Ex-Flags
-            if (!m_spellInfo->IsFitToFamily(SPELLFAMILY_DRUID, UI64LIT(0x0000000000020000)))
-            {
-                SendInterrupted(2);
-                return SPELL_FAILED_NOT_BEHIND;
-            }
+            //Exclusion for Backstab here aswell
+            //if (!m_spellInfo->IsFitToFamily(SPELLFAMILY_DRUID, UI64LIT(0x0000000000020000)))
+            //{
+            //    SendInterrupted(2);
+            //    return SPELL_FAILED_NOT_BEHIND;
+            //}
+
+            SendInterrupted(2);
+            return SPELL_FAILED_NOT_BEHIND;
         }
 
         //Target must be facing you.
