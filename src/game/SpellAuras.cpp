@@ -1523,6 +1523,20 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
             break;
         case SPELLFAMILY_HUNTER:
             break;
+        case SPELLFAMILY_PALADIN:
+        {
+            if (GetSpellProto()->SpellIconID == 237 && GetSpellProto()->SpellVisual == 5622) {                   // Paladin Seal of the Crusader
+                if (apply)
+                {
+                    m_modifier.m_amount = (-1)*m_spellAuraHolder->GetAuraByEffectIndex(EFFECT_INDEX_1)->GetModifier()->m_amount;
+                    m_modifier.m_miscvalue = SPELL_SCHOOL_MASK_NORMAL;
+                    m_modifier.periodictime = 0;
+                }
+                HandleModDamagePercentDone(apply,true);
+                return;
+            }
+            break;
+        }
         case SPELLFAMILY_SHAMAN:
         {
             switch(GetId())
