@@ -11126,45 +11126,8 @@ void Player::ApplyEnchantment(Item *item, EnchantmentSlot slot, bool apply, bool
 
             switch(enchant_display_type)
             {
-                case ITEM_ENCHANTMENT_TYPE_NONE:  // Shaman Rockbiter Weapon
-                {
-                    if(getClass() == CLASS_SHAMAN)
-                    {
-                        float addValue = 0.0f;
-                        switch (pEnchant->ID)
-                        {
-                            case 29:   // Rank 1
-                                addValue = 29;
-                                break;
-                            case 6:    // Rank 2
-                                addValue = 58;
-                                break;
-                            case 1:    // Rank 3
-                                addValue = 88;
-                                break;
-                            case 503:  // Rank 4
-                                addValue = 129;
-                                break;
-                            case 1663: // Rank 5
-                                addValue = 211;
-                                break;
-                            case 683:  // Rank 6
-                                addValue = 393;
-                                break;
-                            case 1664: // Rank 7
-                                addValue = 554;
-                                break;
-                            default:
-                                break;
-                        }
-                        if (addValue)
-                        {
-                            HandleStatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_VALUE, addValue, apply);
-                            return;
-                        }
-                    }
+                case ITEM_ENCHANTMENT_TYPE_NONE:
                     break;
-                }
                 case ITEM_ENCHANTMENT_TYPE_COMBAT_SPELL:
                     // processed in Player::CastItemCombatSpell
                     break;
@@ -11254,8 +11217,24 @@ void Player::ApplyEnchantment(Item *item, EnchantmentSlot slot, bool apply, bool
                     }
                     break;
                 }
-                case ITEM_ENCHANTMENT_TYPE_TOTEM:
+                case ITEM_ENCHANTMENT_TYPE_TOTEM:           // Shaman Rockbiter Weapon
+                {
+                    if(getClass() == CLASS_SHAMAN)
+                    {
+                        float addValue = 0.0f;
+                        if(item->GetSlot() == EQUIPMENT_SLOT_MAINHAND)
+                        {
+                            addValue = float(enchant_amount * item->GetProto()->Delay / 1000.0f);
+                            HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_VALUE, addValue, apply);
+                        }
+                        else if(item->GetSlot() == EQUIPMENT_SLOT_OFFHAND )
+                        {
+                            addValue = float(enchant_amount * item->GetProto()->Delay / 1000.0f);
+                            HandleStatModifier(UNIT_MOD_DAMAGE_OFFHAND, TOTAL_VALUE, addValue, apply);
+                        }
+                    }
                     break;
+                }
                 default:
                     sLog.outError("Unknown item enchantment (id = %d) display type: %d", enchant_id, enchant_display_type);
                     break;
