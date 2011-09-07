@@ -3045,6 +3045,29 @@ void Spell::finish(bool ok)
     if(!m_TriggerSpells.empty())
         CastTriggerSpells();
 
+    // cast active spell on totem summon
+    if (m_caster->GetTypeId() == TYPEID_UNIT && (Totem*)m_caster)
+    {
+        uint32 spellId = 0;
+        switch (m_spellInfo->Id)
+        {
+            case 8515: spellId = 8514; break;   // Windfury Rotem Rank 1
+            case 10609: spellId = 10607; break; // Windfury Rotem Rank 2
+            case 10612: spellId = 10611; break; // Windfury Rotem Rank 3
+            case 8229: spellId = 8230; break;   // Flametongue Totem Rank 1
+            case 8251: spellId = 8250; break;   // Flametongue Totem Rank 2
+            case 10524: spellId = 10521; break; // Flametongue Totem Rank 3
+            case 16388: spellId = 15036; break; // Flametongue Totem Rank 4
+            case 6474: spellId = 3600; break;   // Earthbind Totem
+            case 8145: spellId = 8146; break;   // Tremor Totem
+            case 8179: spellId = 8178; break;   // Grounding Totem
+            case 8167: spellId = 8168; break;   // Poison Cleansing Totem
+            case 8172: spellId = 8171; break;   // Disease Cleansing Totem
+        }
+        if (spellId)
+            m_caster->CastSpell(m_caster, spellId, true);
+    }
+
     // Stop Attack for some spells
     if( m_spellInfo->Attributes & SPELL_ATTR_STOP_ATTACK_TARGET )
         m_caster->AttackStop();
