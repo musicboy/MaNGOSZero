@@ -743,39 +743,55 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     return SPELL_AURA_PROC_FAILED;
 
                 uint32 spellId;
+                float mindmg, maxdmg,basepoints_min, basepoints_max;
                 switch (triggeredByAura->GetId())
                 {
-                    case 21084: spellId = 25742; break;     // Rank 1
-                    case 20287: spellId = 25740; break;     // Rank 2
-                    case 20288: spellId = 25739; break;     // Rank 3
-                    case 20289: spellId = 25738; break;     // Rank 4
-                    case 20290: spellId = 25737; break;     // Rank 5
-                    case 20291: spellId = 25736; break;     // Rank 6
-                    case 20292: spellId = 25735; break;     // Rank 7
-                    case 20293: spellId = 25713; break;     // Rank 8
-                    case 27155: spellId = 27156; break;     // Rank 9
+                    case 21084: spellId = 25742; mindmg = 1; maxdmg = 4; break;   // Rank 1
+                    case 20287: spellId = 25740; mindmg = 2; maxdmg = 8; break;   // Rank 2
+                    case 20288: spellId = 25739; mindmg = 4; maxdmg = 14; break;  // Rank 3
+                    case 20289: spellId = 25738; mindmg = 6; maxdmg = 21; break;  // Rank 4
+                    case 20290: spellId = 25737; mindmg = 9; maxdmg = 31; break;  // Rank 5
+                    case 20291: spellId = 25736; mindmg = 12; maxdmg = 43; break; // Rank 6
+                    case 20292: spellId = 25735; mindmg = 16; maxdmg = 56; break; // Rank 7
+                    case 20293: spellId = 25713; mindmg = 20; maxdmg = 71; break; // Rank 8
+                    case 27155: spellId = 27156; mindmg = 24; maxdmg = 91; break; // Rank 9
                     default:
                         sLog.outError("Unit::HandleDummyAuraProc: non handled possibly SoR (Id = %u)", triggeredByAura->GetId());
                         return SPELL_AURA_PROC_FAILED;
                 }
                 Item *item = ((Player*)this)->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
                 float speed = (item ? item->GetProto()->Delay : BASE_ATTACK_TIME)/1000.0f;
+                float damage_range_factor = 0.68f;
+                float speed_cap_high = 4.0f;
+                float speed_cap_low = 1.3f;
 
-                float damageBasePoints;
-                if(item && item->GetProto()->InventoryType == INVTYPE_2HWEAPON)
-                    // two hand weapon
-                    damageBasePoints=1.20f*triggerAmount * 1.2f * 1.03f * speed/100.0f + 1;
-                else
-                    // one hand weapon/no weapon
-                    damageBasePoints=0.85f*ceil(triggerAmount * 1.2f * 1.03f * speed/100.0f) - 1;
+                basepoints_min = mindmg + (speed - speed_cap_low)*( (maxdmg*damage_range_factor - mindmg)/(speed_cap_high - speed_cap_low) );
+                basepoints_max = ceil(basepoints_min/damage_range_factor);
 
-                int32 damagePoint = int32(damageBasePoints + 0.03f * (GetWeaponDamageRange(BASE_ATTACK,MINDAMAGE)+GetWeaponDamageRange(BASE_ATTACK,MAXDAMAGE))/2.0f) + 1;
+                basepoints_min = floor(basepoints_min);
+
+                if (basepoints_min < mindmg)
+                    basepoints_min = mindmg;
+                if (basepoints_max > maxdmg)
+                    basepoints_max = maxdmg;
+
+                //[-ZERO] Different damage calculation in 1.x
+                //float damageBasePoints;
+                //if(item && item->GetProto()->InventoryType == INVTYPE_2HWEAPON)
+                //    // two hand weapon
+                //    damageBasePoints=1.20f*triggerAmount * 1.2f * 1.03f * speed/100.0f + 1;
+                //else
+                //    // one hand weapon/no weapon
+                //    damageBasePoints=0.85f*ceil(triggerAmount * 1.2f * 1.03f * speed/100.0f) - 1;
+
+                int32 damagePoint = irand(int32(basepoints_min),int32(basepoints_max));
 
                 // apply damage bonuses manually
+                const SpellEntry* triggeredSpell = sSpellStore.LookupEntry(spellId);
                 if(damagePoint >= 0)
                 {
-                    damagePoint = SpellDamageBonusDone(pVictim, dummySpell, damagePoint, SPELL_DIRECT_DAMAGE);
-                    damagePoint = pVictim->SpellDamageBonusTaken(this, dummySpell, damagePoint, SPELL_DIRECT_DAMAGE);
+                    damagePoint = SpellDamageBonusDone(pVictim, triggeredSpell, damagePoint, SPELL_DIRECT_DAMAGE);
+                    damagePoint = pVictim->SpellDamageBonusTaken(this, triggeredSpell, damagePoint, SPELL_DIRECT_DAMAGE);
                 }
 
                 CastCustomSpell(pVictim,spellId,&damagePoint,NULL,NULL,true,NULL, triggeredByAura);
