@@ -5128,6 +5128,15 @@ SpellCastResult Spell::CheckRange(bool strict)
             return SPELL_FAILED_UNIT_NOT_INFRONT;
     }
 
+    // Range check for spells that target game objects
+    if (!target && m_targets.getGOTarget())
+    {
+        float dist = m_caster->GetDistance(m_targets.getGOTarget());
+
+        if(dist > max_range)
+            return SPELL_FAILED_OUT_OF_RANGE;
+    }
+
     // TODO verify that such spells really use bounding radius
     if(m_targets.m_targetMask == TARGET_FLAG_DEST_LOCATION && m_targets.m_destX != 0 && m_targets.m_destY != 0 && m_targets.m_destZ != 0)
     {
