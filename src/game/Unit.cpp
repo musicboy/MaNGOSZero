@@ -7071,13 +7071,10 @@ void Unit::TauntApply(Unit* taunter)
     if (target && target == taunter)
         return;
 
-    if (!HasAuraType(SPELL_AURA_MOD_FEAR) && !HasAuraType(SPELL_AURA_MOD_CONFUSE))
-    {
     SetInFront(taunter);
 
     if (((Creature*)this)->AI())
         ((Creature*)this)->AI()->AttackStart(taunter);
-    }
 
     m_ThreatManager.tauntApply(taunter);
 }
@@ -7179,8 +7176,7 @@ bool Unit::SelectHostileTarget()
 
     if (target)
     {
-        if (!hasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_DIED) &&
-            !HasAuraType(SPELL_AURA_MOD_FEAR) && !HasAuraType(SPELL_AURA_MOD_CONFUSE))
+        if (!hasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_DIED))
         {
             SetInFront(target);
             ((Creature*)this)->AI()->AttackStart(target);
