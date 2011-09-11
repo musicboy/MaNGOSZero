@@ -3618,19 +3618,6 @@ bool Unit::RemoveNoStackAurasDueToAuraHolder(SpellAuraHolder *holder)
         bool is_spellPerTarget = IsSingleFromSpellSpecificSpellRanksPerTarget(spellId_spec,i_spellId_spec);
         if ( is_spellPerTarget && holder->GetCasterGuid() != (*i).second->GetCasterGuid() && sSpellMgr.IsRankSpellDueToSpell(spellProto, i_spellId))
         {
-            // dont apply this to pure DoT spells without any additional modifiers!
-            bool isDoT = true;
-            for (int itr = 0; itr < MAX_EFFECT_INDEX; ++i)
-            {
-                if (spellProto->EffectApplyAuraName[itr] != 0 &&
-                    spellProto->EffectApplyAuraName[itr] != SPELL_AURA_PERIODIC_DAMAGE &&
-                    spellProto->EffectApplyAuraName[itr] != SPELL_AURA_PERIODIC_LEECH &&
-                    spellProto->EffectApplyAuraName[itr] != SPELL_AURA_PERIODIC_MANA_LEECH &&
-                    spellProto->EffectApplyAuraName[itr] != SPELL_AURA_PERIODIC_DAMAGE_PERCENT)
-                    isDoT = false;
-                }
-                if (!isDoT)
-            {
             // cannot remove higher rank
             if(CompareAuraRanks(spellId, i_spellId) < 0)
                 return false;
@@ -3649,13 +3636,10 @@ bool Unit::RemoveNoStackAurasDueToAuraHolder(SpellAuraHolder *holder)
                 next =  m_spellAuraHolders.begin();
 
             continue;
-            }
         }
 
         // non single (per caster) per target spell specific (possible single spell per target at caster)
-        if( !is_spellSpecPerTargetPerCaster && !is_spellSpecPerTarget && (
-            ( sSpellMgr.IsRankSpellDueToSpell(spellProto, i_spellId) && (*i).second->GetCasterGuid() == holder->GetCasterGuid())
-            || sSpellMgr.IsNoStackSpellDueToSpell(spellId, i_spellId) ) )
+        if( !is_spellSpecPerTargetPerCaster && !is_spellSpecPerTarget && sSpellMgr.IsNoStackSpellDueToSpell(spellId, i_spellId) )
         {
             // Its a parent aura (create this aura in ApplyModifier)
             if ((*i).second->IsInUse())
