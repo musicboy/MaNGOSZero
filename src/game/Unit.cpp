@@ -683,7 +683,8 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
         // call kill spell proc event (before real die and combat stop to triggering auras removed at death/combat stop)
         if(player_tap && player_tap != pVictim)
         {
-            player_tap->ProcDamageAndSpell(pVictim, PROC_FLAG_KILL, PROC_FLAG_KILLED, PROC_EX_NONE, 0);
+            if (GetObjectGuid() == player_tap->GetObjectGuid() || (player_tap->GetGroup() && player_tap->GetGroup()->IsMember(GetObjectGuid())))
+                ProcDamageAndSpell(pVictim, PROC_FLAG_KILL, PROC_FLAG_KILLED, PROC_EX_NONE, 0);
 
             WorldPacket data(SMSG_PARTYKILLLOG, (8+8));     //send event PARTY_KILL
             data << player_tap->GetObjectGuid();            //player with killing blow
