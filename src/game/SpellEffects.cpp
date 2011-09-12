@@ -1881,11 +1881,6 @@ void Spell::SendLoot(ObjectGuid guid, LootType loottype, LockType lockType)
                 break;
 
             case GAMEOBJECT_TYPE_TRAP:
-                if (gameObjTarget->GetEntry() == 178559) // Exception for Larva Spewer in Maraudon
-                {
-                    gameObjTarget->SetGoState(GO_STATE_ACTIVE);
-                    return;
-                }
                 if (lockType == LOCKTYPE_DISARM_TRAP)
                 {
                     gameObjTarget->SetLootState(GO_JUST_DEACTIVATED);
@@ -2537,12 +2532,6 @@ void Spell::EffectSummonWild(SpellEffectIndex eff_idx)
 
 void Spell::EffectSummonGuardian(SpellEffectIndex eff_idx)
 {
-    if (m_spellInfo->Id == 8376) // Earthgrab Totem
-    {
-        (*this.*SpellEffects[SPELL_EFFECT_SUMMON_TOTEM])(eff_idx);
-        return;
-    }
-
     uint32 pet_entry = m_spellInfo->EffectMiscValue[eff_idx];
     if (!pet_entry)
         return;
@@ -3966,10 +3955,6 @@ void Spell::EffectActivateObject(SpellEffectIndex eff_idx)
 void Spell::EffectSummonTotem(SpellEffectIndex eff_idx)
 {
     int slot = 0;
-    if (m_spellInfo->Id == 8376) // Earthgrab Totem
-        slot = TOTEM_SLOT_NONE;
-    else
-    {
     switch(m_spellInfo->Effect[eff_idx])
     {
         case SPELL_EFFECT_SUMMON_TOTEM:       slot = TOTEM_SLOT_NONE;  break;
@@ -3978,7 +3963,6 @@ void Spell::EffectSummonTotem(SpellEffectIndex eff_idx)
         case SPELL_EFFECT_SUMMON_TOTEM_SLOT3: slot = TOTEM_SLOT_WATER; break;
         case SPELL_EFFECT_SUMMON_TOTEM_SLOT4: slot = TOTEM_SLOT_AIR;   break;
         default: return;
-        }
     }
 
     // unsummon old totem
