@@ -4302,6 +4302,50 @@ SpellCastResult Spell::CheckCast(bool strict)
             return castResult;
     }
 
+    if (m_spellInfo->SpellFamilyName == SPELLFAMILY_ROGUE)
+    {
+        if (!m_caster->HasInArc(M_PI_F, m_targets.getUnitTarget())
+            && ((m_spellInfo->SpellVisual == 155 && m_spellInfo->SpellIconID == 243)    // Backstab
+            ||  (m_spellInfo->SpellVisual == 757 && m_spellInfo->SpellIconID == 498)    // Garrote
+            ||  (m_spellInfo->SpellVisual == 679 && m_spellInfo->SpellIconID == 499)    // Kidney shot
+            ||  (m_spellInfo->SpellVisual == 253 && m_spellInfo->SpellIconID == 130)    // Sinister Strike
+            ||  (m_spellInfo->SpellVisual == 90 && m_spellInfo->SpellIconID == 246)     // Kick
+            ||  (m_spellInfo->SpellVisual == 256 && m_spellInfo->SpellIconID == 245)    // Gouge
+            ||  (m_spellInfo->SpellVisual == 266 && m_spellInfo->SpellIconID == 244)    // Cheap Shot
+            ||  (m_spellInfo->SpellVisual == 738 && m_spellInfo->SpellIconID == 539)    // Feint
+            ||  (m_spellInfo->SpellVisual == 250 && m_spellInfo->SpellIconID == 500)    // Rupture
+            ||  (m_spellInfo->SpellVisual == 671 && m_spellInfo->SpellIconID == 514)    // Eviscerate
+            ||  (m_spellInfo->SpellVisual == 257 && m_spellInfo->SpellIconID == 249)    // Sap
+            ||  (m_spellInfo->SpellVisual == 3441 && m_spellInfo->SpellIconID == 563)   // Expose Armor
+            ||  (m_spellInfo->SpellVisual == 155 && m_spellInfo->SpellIconID == 856)    // Ambush
+            ||  (m_spellInfo->SpellVisual == 257 && m_spellInfo->SpellIconID == 277)    // Pick Pocket
+            ||  (m_spellInfo->SpellVisual == 3799 && m_spellInfo->SpellIconID == 278)   // Riposte
+            ||  (m_spellInfo->SpellVisual == 4159 && m_spellInfo->SpellIconID == 596)   // Ghostly Strike
+            ||  (m_spellInfo->SpellVisual == 5119 && m_spellInfo->SpellIconID == 153))) // Hemorrhage
+            return SPELL_FAILED_UNIT_NOT_INFRONT;
+        }
+        else if (m_spellInfo->SpellFamilyName == SPELLFAMILY_WARRIOR)
+        {
+        if (!m_caster->HasInArc(M_PI_F, m_targets.getUnitTarget())
+            && ((m_spellInfo->SpellVisual == 42 && m_spellInfo->SpellIconID == 280)     // Shield Bash
+            ||  (m_spellInfo->SpellVisual == 34 && m_spellInfo->SpellIconID == 24)      // Taunt
+            ||  (m_spellInfo->SpellVisual == 3443 && m_spellInfo->SpellIconID == 23)    // Hamstring
+            ||  (m_spellInfo->SpellVisual == 398 && m_spellInfo->SpellIconID == 560)    // Disarm
+            ||  (m_spellInfo->SpellVisual == 39 && m_spellInfo->SpellIconID == 1477)    // Mocking Blow
+            ||  (m_spellInfo->SpellVisual == 372 && m_spellInfo->SpellIconID == 245)    // Rend
+            ||  (m_spellInfo->SpellVisual == 1165 && m_spellInfo->SpellIconID == 559)   // Slam
+            ||  (m_spellInfo->SpellVisual == 250 && m_spellInfo->SpellIconID == 1648)   // Execute
+            ||  (m_spellInfo->SpellVisual == 1023 && m_spellInfo->SpellIconID == 756)   // Pummel
+            ||  (m_spellInfo->SpellVisual == 342 && m_spellInfo->SpellIconID == 562)    // Revenge
+            ||  (m_spellInfo->SpellVisual == 39 && m_spellInfo->SpellIconID == 26)      // Overpower
+            ||  (m_spellInfo->SpellVisual == 406 && m_spellInfo->SpellIconID == 565)    // Sunder Armor
+            ||  (m_spellInfo->SpellVisual == 39 && m_spellInfo->SpellIconID == 564)     // Mortal Strike
+            ||  (m_spellInfo->SpellVisual == 2719 && m_spellInfo->SpellIconID == 25)    // Concussion blow
+            ||  (m_spellInfo->SpellVisual == 372 && m_spellInfo->SpellIconID == 38)     // Bloodthirst
+            ||  (m_spellInfo->SpellVisual == 42 && m_spellInfo->SpellIconID == 413)))   // Shield Slam
+            return SPELL_FAILED_UNIT_NOT_INFRONT;
+    }
+
     for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
         // for effects of spells that have only one target
