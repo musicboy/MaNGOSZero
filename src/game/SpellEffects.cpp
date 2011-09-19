@@ -409,6 +409,15 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     m_caster->CastSpell(unitTarget, spell_id, true);
                     return;
                 }
+                case 4043:                                  // Land Mine Detonation
+                {
+                    Creature* mine = (Creature*)m_caster;
+                    if (mine)
+                    {
+                        mine->ForcedDespawn();
+                        mine->RemoveFromWorld();
+                    }
+                }
                 case 7671:                                  // Transformation (human<->worgen)
                 {
                     if (!unitTarget)
@@ -487,6 +496,24 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     // see spell 10255 (aura dummy)
                     m_caster->clearUnitState(UNIT_STAT_ROOT);
                     m_caster->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    return;
+                }
+                case 11885:									//Muisek Vessel spells
+                case 11886:
+                case 11887:
+                case 11888:
+                case 11889:
+                {
+                    if (!unitTarget)
+                        return;
+
+                    Creature* creatureTarget = (Creature*)unitTarget;
+                    if (creatureTarget)
+                    {
+                        creatureTarget->SaveRespawnTime();
+                        creatureTarget->SetDeathState(JUST_DIED);
+                        creatureTarget->RemoveCorpse();
+                    }
                     return;
                 }
                 case 12162:                                 // Deep wounds
@@ -701,6 +728,11 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     const uint32 spell_list[6] = {17863, 17939, 17943, 17944, 17946, 17948};
 
                     m_caster->CastSpell(unitTarget, spell_list[urand(0, 5)], true);
+                    return;
+                }
+                case 19395:                                 // Gordunni Trap
+                {
+                    m_caster->CastSpell(m_caster, 19394, true);
                     return;
                 }
                 case 19411:                                 // Lava Bomb
@@ -1881,6 +1913,11 @@ void Spell::SendLoot(ObjectGuid guid, LootType loottype, LockType lockType)
                 break;
 
             case GAMEOBJECT_TYPE_TRAP:
+                if (gameObjTarget->GetEntry() == 178559) // Exception for Larva Spewer in Maraudon
+                {
+                    gameObjTarget->SetGoState(GO_STATE_ACTIVE);
+                    return;
+                }
                 if (lockType == LOCKTYPE_DISARM_TRAP)
                 {
                     gameObjTarget->SetLootState(GO_JUST_DEACTIVATED);
@@ -2534,6 +2571,12 @@ void Spell::EffectSummonWild(SpellEffectIndex eff_idx)
 
 void Spell::EffectSummonGuardian(SpellEffectIndex eff_idx)
 {
+    if (m_spellInfo->Id == 8376) // Earthgrab Totem
+    {
+        (*this.*SpellEffects[SPELL_EFFECT_SUMMON_TOTEM])(eff_idx);
+        return;
+    }
+
     uint32 pet_entry = m_spellInfo->EffectMiscValue[eff_idx];
     if (!pet_entry)
         return;
@@ -3952,6 +3995,10 @@ void Spell::EffectActivateObject(SpellEffectIndex eff_idx)
 void Spell::EffectSummonTotem(SpellEffectIndex eff_idx)
 {
     int slot = 0;
+    if (m_spellInfo->Id == 8376) // Earthgrab Totem
+        slot = TOTEM_SLOT_NONE;
+    else
+    {
     switch(m_spellInfo->Effect[eff_idx])
     {
         case SPELL_EFFECT_SUMMON_TOTEM:       slot = TOTEM_SLOT_NONE;  break;
@@ -3960,6 +4007,7 @@ void Spell::EffectSummonTotem(SpellEffectIndex eff_idx)
         case SPELL_EFFECT_SUMMON_TOTEM_SLOT3: slot = TOTEM_SLOT_WATER; break;
         case SPELL_EFFECT_SUMMON_TOTEM_SLOT4: slot = TOTEM_SLOT_AIR;   break;
         default: return;
+        }
     }
 
     // unsummon old totem
