@@ -755,6 +755,10 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
         if (slot_type >= MAX_LOOT_SLOT_TYPE)
             continue;
 
+        if (l.GroupLooterGuid && lv.permission != OWNER_PERMISSION && l.GroupLooterGuid != lv.viewer->GetObjectGuid() 
+            && l.items[i].is_underthreshold)
+            continue;
+
         b << uint8(i) << l.items[i];
         b << uint8(slot_type);                              // 0 - get 1 - look only 2 - master selection
         ++itemsShown;

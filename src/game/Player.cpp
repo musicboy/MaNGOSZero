@@ -7204,6 +7204,8 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
                             default:
                                 break;
                         }
+
+                        group->UpdateLooterGuid(creature);
                     }
                 }
 

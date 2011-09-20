@@ -242,6 +242,8 @@ struct Loot
     uint8 unlootedCount;
     LootType loot_type;                                     // required for for proper item loot finish (store internal loot types in different from 3.x version, in fact this meaning that it send same loot types for interesting cases like 3.x version code, skip pre-3.x client loot type limitaitons)
 
+    ObjectGuid GroupLooterGuid;                             // saves the GUID of the player who has loot right for all items in this Loot with quality under threshold, in case of group loot
+
     Loot(uint32 _gold = 0) : gold(_gold), unlootedCount(0) {}
     ~Loot() { clear(); }
 

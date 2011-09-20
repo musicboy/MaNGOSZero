@@ -518,6 +518,7 @@ void Group::SendLootAllPassed(Roll const& r)
 
 void Group::GroupLoot(Creature *creature, Loot *loot)
 {
+    loot->GroupLooterGuid = GetLooterGuid();
     for(uint8 itemSlot = 0; itemSlot < loot->items.size(); ++itemSlot)
     {
         LootItem& lootItem = loot->items[itemSlot];
