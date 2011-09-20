@@ -4707,17 +4707,8 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if (!target || ((Player*)m_caster) == target || !target->IsInSameRaidWith((Player*)m_caster))
                     return SPELL_FAILED_BAD_TARGETS;
 
-                // check if our map is dungeon
-                if( sMapStore.LookupEntry(m_caster->GetMapId())->IsDungeon() )
-                {
-                    InstanceTemplate const* instance = ObjectMgr::GetInstanceTemplate(m_caster->GetMapId());
-                    if(!instance)
-                        return SPELL_FAILED_TARGET_NOT_IN_INSTANCE;
-                    if ( instance->levelMin > target->getLevel() )
-                        return SPELL_FAILED_LOWLEVEL;
-                    if ( instance->levelMax && instance->levelMax < target->getLevel() )
-                        return SPELL_FAILED_HIGHLEVEL;
-                }
+                if( m_caster->GetMap() && !m_caster->GetMap()->GetPlayer(target->GetObjectGuid()) && (m_caster->GetMapId() > 1 || target->GetMapId() > 1) )
+                    return SPELL_FAILED_TARGET_NOT_IN_INSTANCE;
                 break;
             }
             case SPELL_EFFECT_LEAP:
