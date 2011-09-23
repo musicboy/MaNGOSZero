@@ -238,6 +238,12 @@ void WorldSession::HandleWhoOpcode( WorldPacket & recv_data )
         if (!s_show)
             continue;
 
+        if (itr->second->isGameMaster())
+        {
+            pname = "<GM>";
+            pname.append(itr->second->GetName());
+        }
+
         data << pname;                                      // player name
         data << gname;                                      // guild name
         data << uint32( lvl );                              // player level
