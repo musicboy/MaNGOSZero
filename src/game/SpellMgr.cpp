@@ -18,7 +18,6 @@
  */
 
 #include "SpellMgr.h"
-#include "extras/Mod.h"
 #include "ObjectMgr.h"
 #include "SpellAuraDefines.h"
 #include "ProgressBar.h"
@@ -128,7 +127,9 @@ uint32 GetSpellCastTime(SpellEntry const* spellInfo, Spell const* spell)
     if (spellInfo->Attributes & SPELL_ATTR_RANGED && (!spell || !spell->IsAutoRepeat()))
         castTime += 500;
 
-    sMod.getSpellCastTime(spellInfo,spell,castTime);
+    // Holy Light trigger heal
+    if (spellInfo->Id == 19968)
+        castTime = 0;
 
     return (castTime > 0) ? uint32(castTime) : 0;
 }
