@@ -5525,6 +5525,14 @@ void SpellAuraHolder::Update(uint32 diff)
                 }
             }
         }
+        
+        // Spell add to diminishing group after 15 sec
+        if (((m_maxDuration - m_duration) > 15000) && m_target->GetDiminishing(m_AuraDRGroup) == DIMINISHING_LEVEL_1)
+        {
+            if ((GetDiminishingReturnsGroupType(m_AuraDRGroup) == DRTYPE_PLAYER && m_target->GetTypeId() == TYPEID_PLAYER) ||
+                GetDiminishingReturnsGroupType(m_AuraDRGroup) == DRTYPE_ALL)
+                m_target->IncrDiminishing(m_AuraDRGroup);
+        }
     }
 
     for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
