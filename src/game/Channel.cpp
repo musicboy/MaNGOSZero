@@ -47,6 +47,7 @@ Channel::Channel(const std::string& name, uint32 channel_id)
     }
     else                                                    // it's custom channel
     {
+        m_announce = false;                                 // no join/leave announces
         m_flags |= CHANNEL_FLAG_CUSTOM;
     }
 }
@@ -372,7 +373,7 @@ void Channel::SetOwner(ObjectGuid p, const char *newname)
         return;
     }
 
-    if(sec < SEC_GAMEMASTER && p != m_ownerGuid)
+    if(sec < SEC_MODERATOR && p != m_ownerGUID)
     {
         WorldPacket data;
         MakeNotOwner(&data);
