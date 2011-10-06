@@ -373,7 +373,7 @@ void Channel::SetOwner(ObjectGuid p, const char *newname)
         return;
     }
 
-    if(sec < SEC_MODERATOR && p != m_ownerGUID)
+    if(sec < SEC_MODERATOR && p != m_ownerGuid)
     {
         WorldPacket data;
         MakeNotOwner(&data);
