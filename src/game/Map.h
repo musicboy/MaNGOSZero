@@ -37,7 +37,6 @@
 #include "MapRefManager.h"
 #include "Utilities/TypeList.h"
 #include "ScriptMgr.h"
-#include "CreatureLinkingMgr.h"
 
 #include <bitset>
 #include <list>
@@ -248,8 +247,6 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
         void MonsterYellToMap(CreatureInfo const* cinfo, int32 textId, uint32 language, Unit* target, uint32 senderLowGuid = 0);
         void PlayDirectSoundToMap(uint32 soundId, uint32 zoneId = 0);
 
-        // Get Holder for Creature Linking
-        CreatureLinkingHolder* GetCreatureLinkingHolder() { return &m_creatureLinkingHolder; }
     private:
         void LoadMapAndVMap(int gx, int gy);
 
@@ -335,9 +332,6 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
 
         template<class T>
             void RemoveFromGrid(T*, NGridType *, Cell const&);
-
-        // Holder for information about linked mobs
-        CreatureLinkingHolder m_creatureLinkingHolder;
 };
 
 class MANGOS_DLL_SPEC WorldMap : public Map

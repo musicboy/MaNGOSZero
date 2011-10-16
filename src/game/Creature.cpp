@@ -46,7 +46,6 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
-#include "CreatureLinkingMgr.h"
 
 // apply implementation of the singletons
 #include "Policies/SingletonImp.h"
@@ -431,7 +430,7 @@ void Creature::Update(uint32 update_diff, uint32 diff)
             break;
         case DEAD:
         {
-            if (m_respawnTime <= time(NULL) && (!m_isSpawningLinked || GetMap()->GetCreatureLinkingHolder()->CanSpawn(this)))
+            if( m_respawnTime <= time(NULL) )
             {
                 DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Respawning...");
                 m_respawnTime = 0;
@@ -467,9 +466,6 @@ void Creature::Update(uint32 update_diff, uint32 diff)
                 //Call AI respawn virtual function
                 if (AI())
                     AI()->JustRespawned();
-
-                if (m_isCreatureLinkingTrigger)
-                    GetMap()->GetCreatureLinkingHolder()->DoCreatureLinkingEvent(LINKING_EVENT_RESPAWN, this);
 
                 GetMap()->Add(this);
             }
@@ -735,15 +731,6 @@ bool Creature::Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo cons
         default:
             m_corpseDelay = sWorld.getConfig(CONFIG_UINT32_CORPSE_DECAY_NORMAL);
             break;
-    }
-
-    // Add to CreatureLinkingHolder if needed
-    if (sCreatureLinkingMgr.GetLinkedTriggerInformation(this))
-        cPos.GetMap()->GetCreatureLinkingHolder()->AddSlaveToHolder(this);
-    if (sCreatureLinkingMgr.IsLinkedEventTrigger(this))
-    {
-        m_isCreatureLinkingTrigger = true;
-        cPos.GetMap()->GetCreatureLinkingHolder()->AddMasterToHolder(this);
     }
 
     LoadCreatureAddon();
@@ -1275,11 +1262,6 @@ bool Creature::LoadFromDB(uint32 guidlow, Map *map)
     m_defaultMovementType = MovementGeneratorType(data->movementType);
 
     AIM_Initialize();
-
-    // Creature Linking, Initial load id handled like respawn
-    if (m_isCreatureLinkingTrigger && isAlive())
-        GetMap()->GetCreatureLinkingHolder()->DoCreatureLinkingEvent(LINKING_EVENT_RESPAWN, this);
-
     return true;
 }
 
